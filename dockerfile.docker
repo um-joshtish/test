@@ -1,0 +1,21 @@
+FROM mcr.microsoft.com/windows/servercore/iis:windowsservercore-ltsc2022
+WORKDIR /install
+RUN powershell.exe -Command "Install-WindowsFeature Web-ISAPI-Ext, Web-ISAPI-Filter"
+  # ADD https://shibboleth.net/downloads/service-provider/latest/win64/shibboleth-sp-3.4.0.0-win64.msi shibboleth-sp-win64.msi
+COPY shibboleth-sp-3.4.0.0-win64.msi shibboleth-sp-win64.msi
+RUN ["\\Windows\\system32\\msiexec.exe", "/i", "shibboleth-sp-win64.msi", "/quiet", "/norestart"]
+# RUN ["del", "shibboleth-sp-win64.msi"]
+COPY iisadmin.ps1 /install/iisadmin.ps1
+ADD https://ds.incommon.org/certs/inc-md-cert.pem /opt/shibboleth-sp/etc/shibboleth/inc-md-cert.pem
+ADD https://shibboleth.umich.edu/md/umich-md-sign.pem /opt/shibboleth-sp/etc/shibboleth/umich-md-sign.pem
+ADD https://shibboleth.umich.edu/md/shibboleth-nonprod-cert.pem /opt/shibboleth-sp/etc/shibboleth/shibboleth-nonprod-cert.pem
+COPY shibboleth/sp-encrypt-cert.pem /opt/shibboleth-sp/etc/shibboleth/sp-encrypt-cert.pem
+COPY shibboleth/sp-encrypt-key.pem /opt/shibboleth-sp/etc/shibboleth/sp-encrypt-key.pem
+COPY shibboleth/sp-signing-cert.pem /opt/shibboleth-sp/etc/shibboleth/sp-signing-cert.pem
+COPY shibboleth/sp-signing-key.pem /opt/shibboleth-sp/etc/shibboleth/sp-signing-key.pem
+COPY setup.ps1 ./setup.ps1
+RUN ["powershell.exe", ".\\setup.ps1"]
+WORKDIR /install/shibboleth
+COPY shibboleth/configure_shib.ps1 configure_shib.ps1
+RUN ["powershell.exe", ".\\configure_shib.ps1", "/opt/shibboleth-sp/etc/shibboleth/shibboleth2.xml"]
+# RUN ["powershell.exe", "\\install\\iisadmin.ps1"]
