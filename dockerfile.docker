@@ -17,5 +17,5 @@ COPY setup.ps1 ./setup.ps1
 RUN ["powershell.exe", ".\\setup.ps1"]
 WORKDIR /install/shibboleth
 COPY shibboleth/configure_shib.ps1 configure_shib.ps1
-RUN ["powershell.exe", ".\\configure_shib.ps1", "/opt/shibboleth-sp/etc/shibboleth/shibboleth2.xml"]
-# RUN ["powershell.exe", "\\install\\iisadmin.ps1"]
+RUN ["powershell.exe", ".\\configure_shib.ps1", "\\\opt\\shibboleth-sp\\etc\\shibboleth\\shibboleth2.xml"]
+# RUN ["powershell.exe", "\\\install\\iisadmin.ps1"]
